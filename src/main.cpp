@@ -1,4 +1,5 @@
 #include <iostream>
+#include "logging.hpp"
 
 namespace csdb {
   /**
@@ -9,7 +10,10 @@ namespace csdb {
   static
 #endif
   void init() {
-    std::cout << "DB init called";
+#ifdef _UNIT_TEST_BUILD
+    DEFAULT_LOGGING;
+    DEFAULT_LOGGER_SEVERITY(logging::Severity::trace);
+#endif
+    DEBUG << "DB init called";
   }
-
 }

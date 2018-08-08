@@ -12,10 +12,13 @@ set(CMAKE_MODULE_PATH
   ${CMAKE_CURRENT_SOURCE_DIR}/cmake
   )
 
+add_subdirectory(cslog EXCLUDE_FROM_ALL)
+
 find_package (Threads REQUIRED)
 
 set(COMMON_SOURCE_FILES
   src/main.cpp
+  cslog/src/logging.cpp
   )
 
 macro(create_test name files)
@@ -128,22 +131,15 @@ else()
   add_library(csdb SHARED src/main.cpp ${SOURCE_FILES})
 endif()
 
-enable_testing()
-
 include_directories(
   ${PROJECT_SOURCE_DIR}/src
-  ${TOX_INCLUDE_DIR}
+  cslog/include
   )
 
 target_link_libraries(
   csdb
   ${CMAKE_THREAD_LIBS_INIT}
   ${LIBCXX_LIBRARY}
-  ${GNUTLSXX_LIBRARY}
-  ${GNUTLS_LIBRARIES}
-  ${TOX_LIBRARY}
-  ${SODIUM_LIBRARY}
-  ${STATIC_LIBRT}
   )
 
 include(CTest)
