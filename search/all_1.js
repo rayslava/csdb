@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['csdb',['csdb',['../namespacecsdb.html',1,'']]],
-  ['csdb',['csdb',['../index.html',1,'']]]
+  ['logging',['logging',['../namespacelogging.html',1,'']]],
+  ['logging_2ecpp',['logging.cpp',['../logging_8cpp.html',1,'']]],
+  ['os',['os',['../namespacelogging_1_1os.html',1,'logging']]]
 ];

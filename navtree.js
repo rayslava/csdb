@@ -1,12 +1,8 @@
 var NAVTREE =
 [
-  [ "csdb", "index.html", [
+  [ "cslog", "index.html", [
     [ "Namespaces", null, [
-      [ "Namespace List", "namespaces.html", "namespaces" ],
-      [ "Namespace Members", "namespacemembers.html", [
-        [ "All", "namespacemembers.html", null ],
-        [ "Functions", "namespacemembers_func.html", null ]
-      ] ]
+      [ "Namespace List", "namespaces.html", "namespaces" ]
     ] ],
     [ "Files", null, [
       [ "File List", "files.html", "files" ]
