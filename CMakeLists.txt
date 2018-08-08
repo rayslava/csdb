@@ -17,8 +17,9 @@ add_subdirectory(cslog EXCLUDE_FROM_ALL)
 find_package (Threads REQUIRED)
 
 set(COMMON_SOURCE_FILES
-  src/main.cpp
   cslog/src/logging.cpp
+  src/algo/highwayhash.cpp
+  src/main.cpp
   )
 
 macro(create_test name files)
@@ -132,8 +133,8 @@ else()
 endif()
 
 include_directories(
-  ${PROJECT_SOURCE_DIR}/src
-  cslog/include
+  ${PROJECT_SOURCE_DIR}/include
+  ${PROJECT_SOURCE_DIR}/cslog/include
   )
 
 target_link_libraries(
@@ -144,6 +145,8 @@ target_link_libraries(
 
 include(CTest)
 enable_testing()
+
+create_test(highwayhash test/highwayhash.cpp)
 
 create_test(unit "${all_test_files}")
 

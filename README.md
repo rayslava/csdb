@@ -10,3 +10,8 @@ License
 -------
 
 Software has [2-clause BSD license](https://github.com/rayslava/csdb/blob/master/LICENSE)
+
+Used code
+---------
+
+Google's [highwayhash](https://github.com/google/highwayhash) by By Jan Wassenberg jan.wassenberg@gmail.com and Jyrki Alakuijala jyrki.alakuijala@gmail.com is used.
