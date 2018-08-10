@@ -17,7 +17,7 @@ addons:
 before_install:
     - eval "${MATRIX_EVAL}"
     - pip install --user cpp-coveralls
-    - cd $(mktemp -d) && git clone https://github.com/google/googletest.git && cd googletest && mkdir build && cd build && cmake -DCMAKE_INSTALL_PREFIX=${HOME}/gtest .. && make VERBOSE=1 && make VERBOSE=1 install
+    - cd $(mktemp -d) && git clone https://github.com/google/googletest.git && cd googletest && git checkout release-1.8.0 && mkdir build && cd build && cmake -DCMAKE_INSTALL_PREFIX=${HOME}/gtest .. && make VERBOSE=1 && make VERBOSE=1 install
     - cd $TRAVIS_BUILD_DIR
 matrix:
     include:
