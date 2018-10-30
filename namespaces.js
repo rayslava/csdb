@@ -1,4 +1,4 @@
 var namespaces =
 [
-    [ "logging", "namespacelogging.html", "namespacelogging" ]
+    [ "csdb", "namespacecsdb.html", null ]
 ];
