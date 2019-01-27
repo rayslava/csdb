@@ -19,6 +19,7 @@ find_package (Threads REQUIRED)
 set(COMMON_SOURCE_FILES
   cslog/src/logging.cpp
   src/algo/highwayhash.cpp
+  src/algo/crc64.cpp
   src/main.cpp
   )
 
@@ -147,6 +148,7 @@ include(CTest)
 enable_testing()
 
 create_test(highwayhash test/highwayhash.cpp)
+create_test(crc64 test/crc64.cpp)
 
 create_test(unit "${all_test_files}")
 
