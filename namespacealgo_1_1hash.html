@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>csdb: csdb Namespace Reference</title>
+<title>csdb: algo::hash Namespace Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -84,7 +84,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   </div>
 </div>
 <script type="text/javascript">
-$(document).ready(function(){initNavTree('namespacecsdb.html','');});
+$(document).ready(function(){initNavTree('namespacealgo_1_1hash.html','');});
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -103,32 +103,130 @@ $(document).ready(function(){initNavTree('namespacecsdb.html','');});
 
 <div class="header">
   <div class="summary">
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
-<div class="title">csdb Namespace Reference</div>  </div>
+<div class="title">algo::hash Namespace Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ae8731fc4f6ff18eeb633dbd317e5bf0a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacecsdb.html#ae8731fc4f6ff18eeb633dbd317e5bf0a">__attribute__</a> ((constructor)) static void init()</td></tr>
-<tr class="separator:ae8731fc4f6ff18eeb633dbd317e5bf0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a520074dd0e5621e1850b94d7e9a62b14"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacealgo_1_1hash.html#a520074dd0e5621e1850b94d7e9a62b14">crc32</a> (const uint8_t *s, size_t size, uint32_t init)</td></tr>
+<tr class="separator:a520074dd0e5621e1850b94d7e9a62b14"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0ee2834d90d1c1945440ea030312b975"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacealgo_1_1hash.html#a0ee2834d90d1c1945440ea030312b975">crc64</a> (const uint8_t *s, size_t size, uint64_t init)</td></tr>
+<tr class="separator:a0ee2834d90d1c1945440ea030312b975"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:ae3aedde4c69fccd9d7e5881f24658c40"><td class="memItemLeft" align="right" valign="top">static const uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacealgo_1_1hash.html#ae3aedde4c69fccd9d7e5881f24658c40">crc32_tab</a> []</td></tr>
+<tr class="separator:ae3aedde4c69fccd9d7e5881f24658c40"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab35981c7133afebf1a723d22b44f2afb"><td class="memItemLeft" align="right" valign="top">static const uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacealgo_1_1hash.html#ab35981c7133afebf1a723d22b44f2afb">crc64_tab</a> []</td></tr>
+<tr class="separator:ab35981c7133afebf1a723d22b44f2afb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="ae8731fc4f6ff18eeb633dbd317e5bf0a"></a>
+<a class="anchor" id="a520074dd0e5621e1850b94d7e9a62b14"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">csdb::__attribute__ </td>
+          <td class="memname">uint32_t algo::hash::crc32 </td>
           <td>(</td>
-          <td class="paramtype">(constructor)&#160;</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">const uint8_t *&#160;</td>
+          <td class="paramname"><em>s</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>init</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Initialization of database engine </p>
+
+</div>
+</div>
+<a class="anchor" id="a0ee2834d90d1c1945440ea030312b975"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint64_t algo::hash::crc64 </td>
+          <td>(</td>
+          <td class="paramtype">const uint8_t *&#160;</td>
+          <td class="paramname"><em>s</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint64_t&#160;</td>
+          <td class="paramname"><em>init</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a class="anchor" id="ae3aedde4c69fccd9d7e5881f24658c40"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint32_t algo::hash::crc32_tab[]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ab35981c7133afebf1a723d22b44f2afb"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const uint64_t algo::hash::crc64_tab[]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -137,7 +235,7 @@ Functions</h2></td></tr>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="namespacecsdb.html">csdb</a></li>
+    <li class="navelem"><a class="el" href="namespacealgo.html">algo</a></li><li class="navelem"><a class="el" href="namespacealgo_1_1hash.html">hash</a></li>
     <li class="footer">Generated on Sun Jan 27 2019 17:43:51 for csdb by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.6 </li>

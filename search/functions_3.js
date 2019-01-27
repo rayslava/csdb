@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['permute',['Permute',['../highwayhash_8cpp.html#a875f738e87a6dcf015d6e6bebadaa71c',1,'highwayhash.cpp']]],
-  ['permuteandupdate',['PermuteAndUpdate',['../highwayhash_8cpp.html#a66123f935c93ff63d92a0d40910d1f83',1,'highwayhash.cpp']]]
+  ['modularreduction',['ModularReduction',['../highwayhash_8cpp.html#a42ce3ebc6e0c6426c440b0ef719ca97b',1,'highwayhash.cpp']]]
 ];

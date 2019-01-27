@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['read64',['Read64',['../highwayhash_8cpp.html#aa26ed2ba6b8edd542e3fa3aa0b9b42b1',1,'highwayhash.cpp']]],
-  ['readme_2emd',['README.md',['../README_8md.html',1,'']]],
-  ['rotate32by',['Rotate32By',['../highwayhash_8cpp.html#abea45a48e846be1ec99c7c6755d64c76',1,'highwayhash.cpp']]]
+  ['permute',['Permute',['../highwayhash_8cpp.html#a875f738e87a6dcf015d6e6bebadaa71c',1,'highwayhash.cpp']]],
+  ['permuteandupdate',['PermuteAndUpdate',['../highwayhash_8cpp.html#a66123f935c93ff63d92a0d40910d1f83',1,'highwayhash.cpp']]]
 ];
