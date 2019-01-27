@@ -1,5 +1,4 @@
-#ifndef C_HIGHWAYHASH_H_
-#define C_HIGHWAYHASH_H_
+#pragma once
 
 #include <stdint.h>
 #include <string.h>
@@ -96,5 +95,3 @@ void HighwayHashCatFinish256(const HighwayHashCat* state, uint64_t hash[4]);
 #if defined(__cplusplus) || defined(c_plusplus)
 }  /* extern "C" */
 #endif
-
-#endif  // C_HIGHWAYHASH_H_
