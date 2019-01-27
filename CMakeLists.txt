@@ -20,6 +20,7 @@ set(COMMON_SOURCE_FILES
   cslog/src/logging.cpp
   src/algo/highwayhash.cpp
   src/algo/crc64.cpp
+  src/algo/crc32.cpp
   src/main.cpp
   )
 
@@ -149,6 +150,7 @@ enable_testing()
 
 create_test(highwayhash test/highwayhash.cpp)
 create_test(crc64 test/crc64.cpp)
+create_test(crc32 test/crc32.cpp)
 
 create_test(unit "${all_test_files}")
 
