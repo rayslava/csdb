@@ -11,10 +11,10 @@ build-dir = \
 	rm -rf $1-build && mkdir $1-build && cd $1-build
 
 debug:
-	$(call build-dir, $@) && cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=True -DCMAKE_BUILD_TYPE=Debug && $(MAKE) -j $(JOBS) && ctest -j 1
+	$(call build-dir, $@) && cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=True -DCMAKE_BUILD_TYPE=Debug && $(MAKE) -j $(JOBS) && ctest -j $(JOBS)
 
 release: debug
-	$(call build-dir, $@) && cmake .. -DCMAKE_BUILD_TYPE=Release && $(MAKE) && ctest -j 1
+	$(call build-dir, $@) && cmake .. -DCMAKE_BUILD_TYPE=Release && $(MAKE) && ctest -j $(JOBS)
 
 static:
 	$(call build-dir, $@) && cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DSTATIC=True && $(MAKE) $(BINARY) -j $(JOBS)
