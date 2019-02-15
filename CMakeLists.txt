@@ -21,6 +21,7 @@ set(COMMON_SOURCE_FILES
   src/algo/highwayhash.cpp
   src/algo/crc64.cpp
   src/algo/crc32.cpp
+  src/structure/hashtable.cpp
   src/main.cpp
   )
 
@@ -63,6 +64,10 @@ macro(create_test name files)
             ${name}_tests
             PROPERTIES
             COMPILE_DEFINITIONS _UNIT_TEST_BUILD)
+  set_target_properties(
+            ${name}_tests
+            PROPERTIES
+            COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=pedantic" )
 endmacro(create_test)
 
 include(ConfigSafeGuards)
@@ -151,6 +156,7 @@ enable_testing()
 create_test(highwayhash test/highwayhash.cpp)
 create_test(crc64 test/crc64.cpp)
 create_test(crc32 test/crc32.cpp)
+create_test(hashtable test/hashtable.cpp)
 
 create_test(unit "${all_test_files}")
 

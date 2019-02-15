@@ -1,5 +1,13 @@
 #include <iostream>
+#include <functional>
+#include <memory>
+
 #include "logging.hpp"
+#include "structure/hashtable.hpp"
+#include "algo/crc64.hpp"
+
+using namespace structure::hashtable;
+using namespace algo::hash;
 
 namespace csdb {
   /**
@@ -15,5 +23,6 @@ namespace csdb {
     DEFAULT_LOGGER_SEVERITY(logging::Severity::trace);
 #endif
     DEBUG << "DB init called";
+    auto ht = std::unique_ptr<HashTable<crc64> >();
   }
 }
