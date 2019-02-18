@@ -30,7 +30,7 @@ matrix:
           secure: "Lj6FWQI/E7jVzgzmlLd2zJ85oebkRaqroTGIfYyIgfsiU/vav0m0c3loh7I8YzAFfkOdkrcGlfjnXBkr2NDQ5L48P5Qokr2UgY2BKVSClKo4/yaHR087/DZh2JHFjHdyDZOb0K3NN0HnjdQENxwmHKIYtjfkwghvkSf+ePkotalrNtZ7GXQVcVZTtPZ+tUC40uu18W9Rfy/72R+18biBKeN5yU+qk40Jq61aso0QETqVEEJc/1CgysMLYhTXtT3D/LW44SfCsFat21+92SfThJm3yFoAZjhoM1JEifydiNOTEjVjNtJ1YqamCyUC1nDoqcm1ZRzWcC/ISDbQg/LiGH6mD3129+JwelgaWsrfush4bvT9j52eyle8E0o1c+P8cngrCgmUIDJx8prPXatD68kYna4pAuoXHlRRdB6y6/aJ90OUNr00KtGawuozBZji8FZhvxkUIfIT16Yb9Ye62Qgl6vuiy9igm88a6/8J6KcNAJCuZmkRACaCwUofcnXYdPmvZrvXnKKnBl82adAn1cBdpYlemEF26XPkmnp9o4PCk7hjMqCVZmzdJNS62vjhnRl6DtcdBMFHKhB6P7VJJfjzhDZPooEOre02fpC02l5yD8rrKu9gxIvnPppefCIxSXCjYRCOv7UxSMn/nzQvXW8MVT5Ze8qKuJyIrkAuEmw="
         - compiler: gcc
           env:
-              - COVERAGE="true"
+              - COVERALLS="true"
               - CMAKE_BUILD_TYPE="Debug"
               - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
 script:
