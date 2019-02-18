@@ -24,11 +24,6 @@ matrix:
         - compiler: gcc
           env:
               - VALGRIND="yes"
-              - CMAKE_BUILD_TYPE="Release"
-              - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
-        - compiler: gcc
-          env:
-              - VALGRIND="yes"
               - DOCS="yes"
               - CMAKE_BUILD_TYPE="Debug"
               - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
