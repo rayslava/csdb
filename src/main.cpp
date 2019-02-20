@@ -23,6 +23,6 @@ namespace csdb {
     DEFAULT_LOGGER_SEVERITY(logging::Severity::trace);
 #endif
     DEBUG << "DB init called";
-    auto ht = std::unique_ptr<HashTable<crc64> >();
+    auto ht = std::unique_ptr<HashTable<std::string, int, crc64> >{};
   }
 }

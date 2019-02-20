@@ -3,5 +3,5 @@
 #include "logging.hpp"
 
 namespace structure {
-  namespace hashtable {}
+  namespace hashtable {  }
 }
