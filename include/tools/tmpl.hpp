@@ -28,10 +28,18 @@ namespace tmpl {
     return {f};
   }
 
-  /* Declaration to extract function return type */
+  /* Declarations to extract function return type */
   template <typename R, typename ... A>
   R ret(R (*)(A...));
 
   template <typename C, typename R, typename ... A>
   R ret(R (C::*)(A...));
+
+
+  /* Required for explicit overload ranking */
+  template <unsigned int N>
+  struct rank: rank<N - 1> { };
+
+  template <>
+  struct rank<0> { };
 }

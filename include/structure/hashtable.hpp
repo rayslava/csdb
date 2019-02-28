@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <memory>
 #include <variant>
+#include <optional>
 #include <exception>
 #include <type_traits>
 #include <cstring>
@@ -14,135 +15,228 @@ namespace structure {
   namespace hashtable {
 
     template <typename key_t, typename value_t>
-    class LinkListNode {
+    class Node {
       key_t _key;
-      value_t _value;
-      LinkListNode<key_t, value_t>* _next;
-      LinkListNode<key_t, value_t>* _prev;
+      value_t _value = {};
+      std::unique_ptr<Node<key_t, value_t> > _next = nullptr;
+
     public:
-      LinkListNode(const key_t& key, const value_t& value) :
+      Node(const key_t& key, const value_t& value) :
         _key(key),
         _value(value) {};
+
+      Node(const key_t& key) :
+        _key(key) {};
+
+      value_t& operator=(const value_t& value) {
+        _value = value;
+        return _value;
+      }
+
+      operator value_t const& () const {
+        return _value;
+      }
+
+      operator value_t& () {
+        return _value;
+      }
+
+      value_t& get() {
+        return _value;
+      }
+
+      const key_t& key() const {
+        return _key;
+      }
+
+      std::optional<std::reference_wrapper<value_t> > find(const key_t& key) {
+        auto node = this;
+        do {
+          if (node->_key == key)
+            return std::optional<std::reference_wrapper<value_t> >{node->_value};
+          node = node->_next.get();
+        } while (node);
+        return std::nullopt;
+      }
+
+      value_t& insert(const key_t& key) {
+        auto node = std::unique_ptr<Node<key_t, value_t> >(new Node(key));
+        node->_next = std::move(_next);
+        _next = std::move(node);
+        return _next->get();
+      }
+
+      /**
+       * Return true when need to destroy bucket
+       */
+      bool erase(const key_t& key) {
+        auto prev = this;
+        auto node = this;
+        do {
+          if (node->_key == key) {
+            if (node->_next) {
+              node->_key = std::move(node->_next->_key);
+              node->_value = std::move(node->_next->_value);
+              node->_next = std::move(node->_next->_next);
+              return false;
+            } else {
+              if (prev == node) {
+                return true;
+              } else {
+                prev->_key = std::move(node->_key);
+                prev->_value = std::move(node->_value);
+                prev->_next = std::move(node->_next);
+                return false;
+              }
+            }
+          }
+          prev = node;
+          node = node->_next.get();
+        } while (node);
+        return false;
+      }
     };
 
     template <typename key_t, typename value_t>
-    class LinkList {
-      LinkListNode<key_t, value_t>* _head;
+    class Bucket {
+      enum class Type {
+        Nothing,
+        List
+      };
+
+      Type _type = Type::Nothing;
+      std::unique_ptr<Node<key_t, value_t> > _first_node = nullptr;
     public:
-      LinkList() {};
-      value_t& find (key_t key) {
-        throw std::out_of_range(std::string("Not implemented yet for ") + key);
+
+      Bucket() {}
+
+      value_t& set(const key_t& key) {
+        switch (_type) {
+        case Type::Nothing:
+          _first_node = std::unique_ptr<Node<key_t, value_t> >(new Node<key_t, value_t>(key));
+          _type = Type::List;
+          return _first_node->get();
+        case Type::List:
+          if (auto&& val = _first_node->find(key))
+            return val->get();
+          else
+            return _first_node->insert(key);
+        default:
+          throw std::out_of_range("Not found");
+        }
       }
-      value_t& find (key_t key) const {
-        throw std::out_of_range(std::string("Not implemented yet for ") + key);
+
+      value_t const& get(const key_t& key) const {
+        switch (_type) {
+        case Type::Nothing:
+          throw std::out_of_range("Not found");
+        case Type::List:
+          if (auto&& val = _first_node->find(key))
+            return val->get();
+          else
+            throw std::out_of_range("Not found");
+        default:
+          throw std::out_of_range("Not found");
+        }
+      }
+
+      void erase(const key_t& key) {
+        if (_first_node->erase(key)) {
+          _first_node = nullptr;
+          _type = Type::Nothing;
+        }
       }
     };
 
     template <typename key_t, typename value_t, size_t size>
     class Storage {
-
-      using cell_type = std::variant<value_t,
-                                     LinkList<key_t, value_t>,
-                                     std::nullptr_t>;
-
-      std::unique_ptr<std::array<cell_type, size> > _array = std::make_unique<std::array<cell_type, size> > ();
-      std::array<cell_type, size> arr = *_array;
-
-      value_t& create_element() {
-        return new value_t();
-      }
-
-      value_t& insert_empty(size_t idx) {
-        arr[idx] = create_element();
-        return arr[idx];
-      }
+      std::unique_ptr<std::array<Bucket<key_t, value_t>, size> > _array = std::make_unique<std::array<Bucket<key_t, value_t>, size> > ();
 
     public:
       Storage()
       {
         TRACE << "DB Storage of " << size << " created";
-        _array->fill(nullptr);
       }
 
-      value_t& get(size_t idx, key_t key) {
-        if (std::holds_alternative<std::nullptr_t>(arr[idx])) {
-          throw std::out_of_range("Not found");
-        } else if (std::holds_alternative<value_t>(arr[idx])) {
-          return std::get<value_t>(arr[idx]);
-        } else {
-          auto list = std::get<LinkList<key_t, value_t> >(arr[idx]);
-          return list.find(key);
-        }
+      value_t& set(size_t idx, key_t key) {
+        return (*_array)[idx].set(key);
       }
 
-      value_t& get(size_t idx, key_t key) const {
-        if (std::holds_alternative<std::nullptr_t>(arr[idx])) {
-          throw std::out_of_range("Not found");
-        } else if (std::holds_alternative<value_t>(arr[idx])) {
-          return std::get<value_t>(arr[idx]);
-        } else {
-          auto list = std::get<LinkList<key_t, value_t> >(arr[idx]);
-          return list.find(key);
-        }
+      const value_t& get(size_t idx, key_t key) const {
+        return (*_array)[idx].get(key);
       }
+
+      void erase(size_t idx, key_t key) {
+        return (*_array)[idx].erase(key);
+      }
+
     };
 
     constexpr size_t storage_len = 1 << 14;
-
-    // overload ranking
-    template <unsigned int N>
-    struct rank: rank<N - 1> { };
-
-    template <>
-    struct rank<0> { };
 
     template <typename key_t,
               typename value_t,
               auto hash, class Ret = decltype(tmpl::ret(hash))>
     class HashTable {
       Storage<key_t, value_t, storage_len> _storage;
-      std::function<Ret(const uint8_t * data, size_t size,
-                        const Ret init)> hash_func = tmpl::toFunction(hash);
+      std::function<Ret(const uint8_t * data,
+                        size_t size,
+                        const Ret init)> hashFunc = tmpl::toFunction(hash);
 
       template <typename T>
-      Ret do_hash(T key, rank<0>)  {
+      Ret doHash(T key, tmpl::rank<0>) const {
         const uint8_t* data = &key;
         size_t size = sizeof(key);
-        return hash_func(data, size, 0);
+        return hashFunc(data, size, 0);
       }
 
       template <typename T,
                 std::enable_if_t<std::is_convertible_v<std::decay_t<T>, const char *> > * = nullptr>
-      Ret do_hash(T key, rank<1>) {
+      Ret doHash(T key, tmpl::rank<1>) const {
         auto data = reinterpret_cast<const uint8_t *>(key);
         size_t size = strlen(key);
-        return hash_func(data, size, 0);
+        return hashFunc(data, size, 0);
       }
 
       template <typename T,
                 std::enable_if_t<std::is_same_v<std::decay_t<T>, std::string> > * = nullptr>
-      Ret do_hash(const T& key, rank<1>) {
-        const uint8_t* data = key.c_str();
+      Ret doHash(const T& key, tmpl::rank<1>) const {
+        const uint8_t* data = reinterpret_cast<const uint8_t *>(key.c_str());
         size_t size = key.length();
-        return hash_func(data, size, 0);
+        return hashFunc(data, size, 0);
       }
 
       template <typename T>
-      Ret do_hash(T t) {
-        return do_hash(t, rank<1>{});
+      Ret doHash(T t) const {
+        return doHash(t, tmpl::rank<1>{});
       }
 
     public:
-      HashTable() {};
+      HashTable() {}
       ~HashTable() {
         DEBUG << "Destroying hash table";
-      };
-      value_t& operator[] (const key_t& key) {
-        return _storage.get(do_hash(key) % storage_len, key);
-      };
+      }
+
+      operator const HashTable&() const {
+        return *this;
+      }
+
       const value_t& operator[] (const key_t& key) const {
-        return _storage.get(do_hash(key) % storage_len, key);
-      };
+        return _storage.get(doHash(key) % storage_len, key);
+      }
+
+      const value_t& at(const key_t& key) const {
+        return _storage.get(doHash(key) % storage_len, key);
+      }
+
+      value_t& operator[] (const key_t& key) {
+        return _storage.set(doHash(key) % storage_len, key);
+      }
+
+      void erase(const key_t& key) {
+        return _storage.erase(doHash(key) % storage_len, key);
+      }
+
     };
   }
 }
