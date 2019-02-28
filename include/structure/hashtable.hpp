@@ -28,20 +28,7 @@ namespace structure {
       Node(const key_t& key) :
         _key(key) {};
 
-      value_t& operator=(const value_t& value) {
-        _value = value;
-        return _value;
-      }
-
-      operator value_t const& () const {
-        return _value;
-      }
-
-      operator value_t& () {
-        return _value;
-      }
-
-      value_t& get() {
+      value_t& value() {
         return _value;
       }
 
@@ -52,7 +39,7 @@ namespace structure {
       std::optional<std::reference_wrapper<value_t> > find(const key_t& key) {
         auto node = this;
         do {
-          if (node->_key == key)
+          if (node->key() == key)
             return std::optional<std::reference_wrapper<value_t> >{node->_value};
           node = node->_next.get();
         } while (node);
@@ -63,7 +50,7 @@ namespace structure {
         auto node = std::unique_ptr<Node<key_t, value_t> >(new Node(key));
         node->_next = std::move(_next);
         _next = std::move(node);
-        return _next->get();
+        return _next->value();
       }
 
       /**
@@ -73,7 +60,7 @@ namespace structure {
         auto prev = this;
         auto node = this;
         do {
-          if (node->_key == key) {
+          if (node->key() == key) {
             if (node->_next) {
               node->_key = std::move(node->_next->_key);
               node->_value = std::move(node->_next->_value);
@@ -83,9 +70,7 @@ namespace structure {
               if (prev == node) {
                 return true;
               } else {
-                prev->_key = std::move(node->_key);
-                prev->_value = std::move(node->_value);
-                prev->_next = std::move(node->_next);
+                prev->_next = nullptr;
                 return false;
               }
             }
@@ -115,14 +100,13 @@ namespace structure {
         case Type::Nothing:
           _first_node = std::unique_ptr<Node<key_t, value_t> >(new Node<key_t, value_t>(key));
           _type = Type::List;
-          return _first_node->get();
+          return _first_node->value();
         case Type::List:
+        default:
           if (auto&& val = _first_node->find(key))
             return val->get();
           else
             return _first_node->insert(key);
-        default:
-          throw std::out_of_range("Not found");
         }
       }
 
@@ -131,12 +115,11 @@ namespace structure {
         case Type::Nothing:
           throw std::out_of_range("Not found");
         case Type::List:
+        default:
           if (auto&& val = _first_node->find(key))
             return val->get();
           else
             throw std::out_of_range("Not found");
-        default:
-          throw std::out_of_range("Not found");
         }
       }
 
@@ -215,10 +198,6 @@ namespace structure {
       HashTable() {}
       ~HashTable() {
         DEBUG << "Destroying hash table";
-      }
-
-      operator const HashTable&() const {
-        return *this;
       }
 
       const value_t& operator[] (const key_t& key) const {

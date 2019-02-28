@@ -11,6 +11,7 @@ namespace structure::hashtable {
   using namespace algo::hash;
   const char* key = "test";
   const char* key2 = "test2";
+  const char* key3 = "test3";
 
   template class HashTable<std::string, int, crc64>;
   template class HashTable<std::string, int, crc32>;
@@ -20,7 +21,6 @@ namespace structure::hashtable {
 
   TEST(hashtable, construct)
   {
-
     EXPECT_NO_THROW(({
       HashTable<std::string, int, crc32> ht{};
     }));
@@ -48,9 +48,16 @@ namespace structure::hashtable {
 
   TEST (hashtable, set)
   {
+    EXPECT_NO_THROW(({
+      HashTable<std::string, int, crc32> ht{};
+      ht[key] = 42;
+    }));
+
     HashTable<const char *, int, crc64> ht{};
     ht[key] = 42;
     ASSERT_EQ(ht.at(key), 42);
+    ht[key] = 43;
+    ASSERT_EQ(ht.at(key), 43);
   }
 
   uint64_t fake_hash(const uint8_t* s, size_t size, uint64_t init=0) {
@@ -91,5 +98,19 @@ namespace structure::hashtable {
       const auto& reader = ht;
       const auto& a = reader[key2];
     }), std::out_of_range);
+    ht[key] = 42;
+    ht[key2] = 43;
+    ht[key3] = 44;
+    ht.erase(key3);
+    ht.erase(key2);
+    EXPECT_THROW(({
+      const auto& reader = ht;
+      const auto& a = reader[key3];
+    }), std::out_of_range);
+    ASSERT_EQ(ht.at(key), 42);
+    EXPECT_NO_THROW(({
+      ht.erase(key2);
+    }));
+
   }
 }
