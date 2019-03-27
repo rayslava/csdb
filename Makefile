@@ -90,7 +90,7 @@ deploy: dockerbuild/$(BINARY).tar.gz
 	rm dockerbuild/$(BINARY).tar.gz
 
 coverage:
-	$(call build-dir, $@) &&  cmake .. -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=True && $(MAKE) coverage
+	$(call build-dir, $@) &&  cmake .. -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=True && $(MAKE) coverage && [ -e `which gcovr` ] && `which gcovr` -r . -b -k --html --html-details -o report.html
 
 dockerized-build: dockerbuild/$(BINARY).tar.gz
 	cd dockerbuild && docker run -v "$(shell pwd)/dockerbuild:/mnt/host" $(BINARY) /bin/bash -c 'cd /root && tar xfz /mnt/host/$(BINARY).tar.gz && cd $(BINARY) && export LD_LIBRARY_PATH=/usr/lib/llvm-6.0/lib/ && export PATH=/usr/lib/llvm-6.0/bin:$$PATH && make'

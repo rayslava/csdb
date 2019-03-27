@@ -157,6 +157,7 @@ create_test(highwayhash test/highwayhash.cpp)
 create_test(crc64 test/crc64.cpp)
 create_test(crc32 test/crc32.cpp)
 create_test(hashtable test/hashtable.cpp)
+create_test(bptree test/bptree.cpp)
 
 create_test(unit "${all_test_files}")
 

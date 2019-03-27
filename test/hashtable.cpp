@@ -111,6 +111,5 @@ namespace structure::hashtable {
     EXPECT_NO_THROW(({
       ht.erase(key2);
     }));
-
   }
 }
