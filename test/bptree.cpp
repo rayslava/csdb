@@ -14,10 +14,12 @@ namespace structure::bptree {
 
   TEST(bptree, construct)
   {
+    BPTree<uint64_t, int, 3> bt{};
+    auto& newval = bt.insert(42, 43);
+
     EXPECT_NO_THROW(({
-      BPTree<uint64_t, int, 4> bt{};
-      auto& newval = bt.insert(42);
-      newval = 43;
+      BPTree<uint64_t, int, 3> bt{};
+      auto& newval = bt.insert(42, 54);
     }));
   }
 }
