@@ -11,53 +11,47 @@
 
 namespace structure {
   namespace bptree {
-    template <typename key_t, uint8_t b_factor>
+    template <typename key_t>
+
     struct Node {
       struct {
         bool isLeaf : 1;
         bool isEmpty : 1;
-        uint8_t count : 8;
       } flags;
-      std::array<key_t, b_factor> _keys = {};    /**< Keys stored in the node */
-      Node* _next = nullptr;                     /**< Link to right node */
-      Node* _parent = nullptr;                   /**< Link to parent node (for splitting) */
+      key_t key = {};    /**< Keys stored in the node */
 
       virtual ~Node() {};
     };
 
-    template <typename key_t, uint8_t b_factor>
-    struct LayerNode: public Node<key_t, b_factor> {
-      /** Links for next nodes
-
-          One for right link from biggest key
-       */
-      std::array<std::unique_ptr<Node<key_t, b_factor> >, b_factor + 1> _links = {};
-      virtual ~LayerNode() {};
-    };
-
-    template <typename key_t, typename value_t, uint8_t b_factor>
-    struct Leaf: public Node<key_t, b_factor> {
+    template <typename key_t, typename value_t>
+    struct Leaf: public Node<key_t> {
     public:
-      std::array<value_t, b_factor> _data = {};
+      value_t data = {};
+      Node<key_t>* next = nullptr;
 
       Leaf() {
         this->flags.isLeaf = true;
         this->flags.isEmpty = true;
-        this->flags.count = 0;
       }
 
-      value_t& getValue(key_t key) {
-        const auto& location = std::find(this->_keys.cbegin(), this->_keys.cend(), key);
-        if (location != this->_keys.cend()) {
-          const auto index = std::distance(this->_keys.cbegin(), location);
-          return _data[index];
-        } else {
+      value_t& value(const key_t& req_key) {
+	if (this->key == req_key)
+	  return data;
+	else
           throw std::out_of_range("Not such value in node");
-        }
       }
 
       virtual ~Leaf() {};
     };
+
+    template <typename key_t, typename value_t>
+    struct LayerNode: public Node<key_t> {
+      std::unique_ptr<Node<key_t>> left =  std::make_unique<Leaf<key_t, value_t>>();
+      std::unique_ptr<Node<key_t>> right =  std::make_unique<Leaf<key_t, value_t>>();
+
+      virtual ~LayerNode() {}
+    };
+
 
     template <typename key_t, typename value_t, uint8_t b_factor>
     class BPTree {
