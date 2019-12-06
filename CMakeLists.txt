@@ -162,7 +162,7 @@ create_test(bptree test/bptree.cpp)
 create_test(unit "${all_test_files}")
 
 if (COVERAGE)
-  setup_target_for_coverage(coverage unit_tests CMakeFiles/unit_tests.dir/src coverage)
+  setup_target_for_coverage(coverage unit_tests CMakeFiles/unit_tests.dir/test coverage)
 endif()
 
 if (COVERALLS)
