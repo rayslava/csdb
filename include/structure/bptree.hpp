@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <cassert>
 #include <array>
+#include <string>
 #include <type_traits>
 #include <variant>
 #include <optional>
@@ -33,34 +34,6 @@ namespace structure {
         bool isEmpty : 1;
         uint8_t size : 8;
       } status;
-
-#if defined(_UNIT_TEST_BUILD)
-      static void dumpNode(nodeptr_t node) {
-        if (node->isLeaf()) {
-          for (int i = 0; i < node->size(); i++) {
-            std::cout << "k" << node->keys[i]
-                      << "v" << std::get<value_t>(node->values[i]) << " ";
-          }
-        } else {
-          for (int i = 0; i < node->size(); i++) {
-            std::cout << "k" << node->keys[i] << " -> { ";
-            dumpNode(std::get<nodeptr_t>(node->values[i]));
-            std::cout << " } " << std::endl;
-          }
-          std::cout << "k" << node->keys[node->size() - 1] << " -> { ";
-          dumpNode(std::get<nodeptr_t>(node->values[node->size()]));
-          std::cout << " } " << std::endl;
-        }
-      }
-
-      void dumpDot() {
-        std::cout << std::endl << std::endl << "-----CUT------" << std::endl;
-        std::cout << "digraph G {" << std::endl;
-        dumpNode(this);
-        std::cout << std::endl << "}";
-        std::cout << std::endl << "-----CUT------" << std::endl;
-      };
-#endif
 
       /** Return size of node */
       uint8_t size() const { return status.size; };
@@ -284,46 +257,33 @@ namespace structure {
 #endif
 
             auto [newleft, newright, smaller] = split(p, key);
-	    // TODO: Fix this
-            {
-              // Add node to newleft
-	      key_t newkey = node->keys[0];
-              int i = 0, j = 0;
-              while (newkey > newleft->keys[i] && i < newleft->size()) i++;
+	    // Now we have node and newnode to place into newleft and newright
 
-              // Move rest of keys and values to the right
-              for (j = newleft->size(); j > i; j--) {
-                newleft->keys[j] = newleft->keys[j - 1];
-                newleft->values[j] = newleft->values[j - 1];
-              }
+	    // Find a place to push node
+	    {
+	      const auto newleft_min = newleft->keys[0];
+	      const auto newleft_max = newleft->keys[newleft->size() - 1];
 
-              // Increase size
-              newleft->status.size++;
+	      const auto newright_min = newright->keys[0];
+	      const auto newright_max = newright->keys[newright->size() - 1];
 
-              // Set actual value
-              newleft->keys[i] = newkey;
-              newleft->values[i] = node;
-            }
+	      nodeptr_t node_target, newnode_target;
+	      key_t node_newkey = node->keys[0];
+	      key_t newnode_newkey = newnode->keys[0];
 
-            {
-              // Add newnode to newright
-	      key_t newkey = newnode->keys[0];
-              int i = 0, j = 0;
-              while (newkey > newright->keys[i] && i < newright->size()) i++;
+              if (newleft_min < node_newkey && newleft_max >= node_newkey)
+		node_target = newleft;
+	      else
+		node_target = newright;
 
-              // Move rest of keys and values to the right
-              for (j = newright->size(); j > i; j--) {
-                newright->keys[j] = newright->keys[j - 1];
-                newright->values[j] = newright->values[j - 1];
-              }
+              if (newleft_min < newnode_newkey && newleft_max >= newnode_newkey)
+		newnode_target = newleft;
+	      else
+		newnode_target = newright;
 
-              // Increase size
-              newright->status.size++;
-
-              // Set actual value
-              newright->keys[i] = newkey;
-              newright->values[i] = newnode;
-            }
+	      do_insert(node_target, node_newkey, node);
+	      do_insert(newnode_target, newnode_newkey, newnode);
+	    }
 
 #if defined(_UNIT_TEST_BUILD)
 	ss.str("");
@@ -390,6 +350,51 @@ namespace structure {
       }
 
     public:
+#if defined(_UNIT_TEST_BUILD)
+      static void dumpNode(nodeptr_t node) {
+        if (node->isLeaf()) {
+          for (int i = 0; i < node->size(); i++) {
+            std::cout << "k" << node->keys[i]
+                      << "v" << std::get<value_t>(node->values[i]) << " ";
+          }
+        } else {
+          for (int i = 0; i < node->size(); i++) {
+            std::cout << "k" << node->keys[i] << " -> { ";
+            dumpNode(std::get<nodeptr_t>(node->values[i]));
+            std::cout << " } " << std::endl;
+          }
+          std::cout << "k" << node->keys[node->size() - 1] << " -> { ";
+          dumpNode(std::get<nodeptr_t>(node->values[node->size()]));
+          std::cout << " } " << std::endl;
+        }
+      }
+
+      void dumpDot() {
+        std::cout << std::endl << std::endl << "-----CUT------" << std::endl;
+        std::cout << "digraph G {" << std::endl;
+        dumpNode(this);
+        std::cout << std::endl << "}";
+        std::cout << std::endl << "-----CUT------" << std::endl;
+      };
+
+      std::string dump(nodeptr_t current_node) {
+	std::string result;
+	if (current_node->isLeaf()) {
+	  std::ostringstream ss;
+	  ss << "[ ";
+	  for (int i = 0; i < current_node->size(); i++)
+	    ss << current_node->keys[i] << " ";
+	  ss << "]";
+	  return ss.str();
+	} else {
+	  for (int i = 0; i < current_node->size(); i++) {
+	    result += "(<" + std::to_string(current_node->keys[i]) + " " + dump(std::get<nodeptr_t>(current_node->values[i])) + ") ";
+	  }
+	  result += "(>" + std::to_string(current_node->keys[current_node->size()-1]) + " " + dump(std::get<nodeptr_t>(current_node->values[current_node->size()])) + ")";
+	  return result;
+	}
+      }
+#endif
       BPTNode(bool leaf, nodeptr_t prt=nullptr) :
         status{leaf, true, 0},
         parent{prt}
