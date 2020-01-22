@@ -4,6 +4,7 @@
 #include <array>
 #include <string>
 #include <type_traits>
+#include <typeinfo>
 #include <variant>
 #include <optional>
 #include <algorithm>
@@ -318,7 +319,15 @@ namespace structure {
        *
        * Boundary checks must be done before
        */
-      static void do_insert(nodeptr_t node, key_t key, value_t value) {
+      template <typename value_type>
+      static void do_insert(nodeptr_t node, key_t key, value_type value) {
+#ifndef NDEBUG
+	assert(node);
+	if (node->isLeaf())
+	  assert(typeid(value) == typeid(value_t));
+	if (!node->isLeaf())
+	  assert(typeid(value) == typeid(nodeptr_t));
+#endif
         int i = 0, j = 0;
         while (key > node->keys[i] && i < node->size()) i++;
 
@@ -345,54 +354,43 @@ namespace structure {
 	for (int i = 0; i < node->size(); i++)
 	  ss << node->keys[i] << " ";
 
-	TRACE << "Placed " << key << " to (" << std::to_string(node->size()) << ") " << ss.str();
+	TRACE << "Placed <" << typeid(value).name() << "> "
+	      << key << ":" << value << " to (" << std::to_string(node->size()) << ") " << ss.str();
 #endif
       }
 
     public:
 #if defined(_UNIT_TEST_BUILD)
-      static void dumpNode(nodeptr_t node) {
-        if (node->isLeaf()) {
-          for (int i = 0; i < node->size(); i++) {
-            std::cout << "k" << node->keys[i]
-                      << "v" << std::get<value_t>(node->values[i]) << " ";
-          }
-        } else {
-          for (int i = 0; i < node->size(); i++) {
-            std::cout << "k" << node->keys[i] << " -> { ";
-            dumpNode(std::get<nodeptr_t>(node->values[i]));
-            std::cout << " } " << std::endl;
-          }
-          std::cout << "k" << node->keys[node->size() - 1] << " -> { ";
-          dumpNode(std::get<nodeptr_t>(node->values[node->size()]));
-          std::cout << " } " << std::endl;
-        }
-      }
-
-      void dumpDot() {
-        std::cout << std::endl << std::endl << "-----CUT------" << std::endl;
-        std::cout << "digraph G {" << std::endl;
-        dumpNode(this);
-        std::cout << std::endl << "}";
-        std::cout << std::endl << "-----CUT------" << std::endl;
-      };
-
-      std::string dump(nodeptr_t current_node) {
+      operator std::string() const {
 	std::string result;
-	if (current_node->isLeaf()) {
+	if (isLeaf()) {
 	  std::ostringstream ss;
 	  ss << "[ ";
-	  for (int i = 0; i < current_node->size(); i++)
-	    ss << current_node->keys[i] << " ";
+	  for (int i = 0; i < size(); i++)
+	    ss << keys[i] << " ";
 	  ss << "]";
 	  return ss.str();
 	} else {
-	  for (int i = 0; i < current_node->size(); i++) {
-	    result += "(<" + std::to_string(current_node->keys[i]) + " " + dump(std::get<nodeptr_t>(current_node->values[i])) + ") ";
+	  for (int i = 0; i < size(); i++) {
+	    std::string contents = *std::get<nodeptr_t>(values[i]);
+	    result += "(<" + std::to_string(keys[i]) + " " + contents + ") ";
 	  }
-	  result += "(>" + std::to_string(current_node->keys[current_node->size()-1]) + " " + dump(std::get<nodeptr_t>(current_node->values[current_node->size()])) + ")";
+	  std::string contents = *std::get<nodeptr_t>(values[size()]);
+	  result += "(>" + std::to_string(keys[size()-1]) + " " + contents + ")";
 	  return result;
 	}
+      }
+
+      friend std::ostream& operator<< (std::ostream& out, const nodeptr_t& p) {
+	if (!p)
+	  return out;
+	std::string newline = *p;
+	return out << newline;
+      }
+
+      friend std::ostream& operator<< (std::ostream& out, const BPTNode<key_t, value_t, b_factor>& n) {
+	std::string newline = n;
+	return out << newline;
       }
 #endif
       BPTNode(bool leaf, nodeptr_t prt=nullptr) :

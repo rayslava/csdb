@@ -33,7 +33,7 @@ namespace csdb {
 	for (int i = 20; i > 0; i--) {
 	  ind->insert(i * 10, i);
 	  std::this_thread::sleep_for(std::chrono::milliseconds(200));
-	  TRACE << ind->dump(ind.get());
+	  TRACE << *ind.get();
 	}
     std::this_thread::sleep_for(std::chrono::milliseconds(1500));
     auto something = ind->find(7*10);
