@@ -82,6 +82,7 @@ namespace structure::bptree {
     node.values[0] = leafl;
     node.values[1] = leafr;
     node.status.size = 1;
+    node.status.isEmpty = false;
 
     leafl->keys[0] = 30;
     leafl->values[0] = 1;
@@ -110,6 +111,14 @@ namespace structure::bptree {
     auto newleaf1 = std::get<testnode_t *>(node.values[0]);
     auto newleaf2 = std::get<testnode_t *>(node.values[1]);
     auto newleaf3 = std::get<testnode_t *>(node.values[2]);
+
+    std::string leafline1{node};
+    std::string leafline2{*leafl};
+    std::string leafline3{*leafr};
+
+    std::string nleafline1{*newleaf1};
+    std::string nleafline2{*newleaf2};
+    std::string nleafline3{*newleaf3};
 
     ASSERT_EQ(newleaf1->status.size, 2);
     ASSERT_EQ(newleaf2->status.size, 2);
@@ -237,7 +246,7 @@ namespace structure::bptree {
       }
       for (int i = 1; i <= 20; i++) {
         auto something = node.find(i * 13);
-	std::cout << "finding " << i*13 << std::endl;
+        std::cout << "finding " << i * 13 << std::endl;
         ASSERT_TRUE(something.has_value());
         ASSERT_EQ(something, i);
       }

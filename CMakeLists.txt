@@ -89,7 +89,7 @@ endif()
 # Enable thread-safe POSIX implementations of C library
 add_definitions(-D_POSIX_C_SOURCE)
 
-set(STANDARD "-std=c++2a")
+set(STANDARD "-std=gnu++20")
 
 set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -Wall -Wno-unknown-pragmas -Wno-sign-compare -Woverloaded-virtual -Wwrite-strings -Wno-unused ${STANDARD} -Wextra -pedantic -Werror -pthread")
 set(CMAKE_CXX_FLAGS_PROFILED "${CMAKE_CXX_FLAGS} -pg")

@@ -58,13 +58,13 @@ namespace structure {
       static nodeptr_t findLeaf(nodeptr_t current_node, const key_t& key) {
         while (!current_node->isLeaf()) {
 #if defined(_UNIT_TEST_BUILD)
-	TRACE << "Searching " << key << " in " << current_node;
+          TRACE << "Searching " << key << " in " << current_node;
 #endif
           for (int i = 0; i <= current_node->size(); i++) {
             if (i == current_node->size()) {
               current_node = std::get<nodeptr_t>(current_node->values[current_node->size()]);
 #if defined(_UNIT_TEST_BUILD)
-	      TRACE << "Going " << current_node;
+              TRACE << "Going " << current_node;
 #endif
               break;
             }
@@ -72,7 +72,7 @@ namespace structure {
             if (key < current_node->keys[i]) {
               current_node = std::get<nodeptr_t>(current_node->values[i]);
 #if defined(_UNIT_TEST_BUILD)
-	      TRACE << "Going " << current_node;
+              TRACE << "Going " << current_node;
 #endif
 
               break;
@@ -80,7 +80,7 @@ namespace structure {
           }
         }
 #if defined(_UNIT_TEST_BUILD)
-	TRACE << "Found node: " << current_node;
+        TRACE << "Found node: " << current_node;
 #endif
         return current_node;
       }
@@ -105,10 +105,10 @@ namespace structure {
         // Save maximal old key for further search
         const key_t max_old = node->keys[node->size() - 1];
 #if defined(_UNIT_TEST_BUILD)
-	TRACE << "Splitting " << node;
+        TRACE << "Splitting " << node;
 #endif
         // Create now node rightside, and keep parent for both
-        auto newnode = new BPTNode<key_t, value_t, b_factor>{node->isLeaf(), node};
+        auto newnode = new BPTNode<key_t, value_t, b_factor>{node->isLeaf(), node->parent};
         key_t min_new;
 
         {
@@ -120,26 +120,26 @@ namespace structure {
             newnode->values[j] = node->values[i];
           }
           newnode->status.size = node->size() - newsize + (node->isLeaf()?0:1); // Size of new node
-	  newnode->status.isEmpty = false;
+          newnode->status.isEmpty = false;
 
-          node->status.size = newsize ;                  // Update size
           min_new = newnode->keys[0];                    // Key for new node in parent
 
           if (node->isLeaf()) {                          // If this is leaf...
             newnode->values[newnode->size()] = node->values[node->size()]; // move old link
             node->values[newsize] = newnode;             // keep link to the righthand node
           } else {                                       // If this is node...
-	    for (i = 1; i <= newnode->size(); i++) {     // delete 1st element for deduplication
-	      newnode->keys[i-1] = newnode->keys[i];
-	      newnode->values[i-1] = newnode->values[i];
-	      newnode->status.size--;
-	    }
-	  }
+            for (i = 1; i <= newnode->size(); i++) {     // delete 1st element for deduplication
+              newnode->keys[i - 1] = newnode->keys[i];
+              newnode->values[i - 1] = newnode->values[i];
+              newnode->status.size--;
+            }
+          }
+          node->status.size = newsize;                   // Update size
 
 #if defined(_UNIT_TEST_BUILD)
-	TRACE << "   Node " << node;
-	TRACE << "Newnode " << newnode;
-	TRACE << "min_new " << min_new;
+          TRACE << "   Node " << node;
+          TRACE << "Newnode " << newnode;
+          TRACE << "min_new " << min_new;
 #endif
         }
 
@@ -147,10 +147,10 @@ namespace structure {
           // Update parent node
           auto p = node->parent;
 #if defined(_UNIT_TEST_BUILD)
-	  TRACE << "Updating parent node " << p;
+          TRACE << "Updating parent node " << p;
 #endif
           if (!p) {
-	    TRACE << "Splitting root node";
+            TRACE << "Splitting root node";
             // Have to split root node
             // newnode is a new right node and node is a new left node
             // just have to swap node with newleft
@@ -172,24 +172,25 @@ namespace structure {
             node->status.isEmpty = false;
 
 #if defined(_UNIT_TEST_BUILD)
-	    TRACE << " Newleft " << newleft;
-	    TRACE << " Newright "<< newnode;
-	    TRACE << " min_new " << min_new;
-	    TRACE << "  Parent " << node;
+            TRACE << " Newleft " << newleft;
+            TRACE << " Newright " << newnode;
+            TRACE << " min_new " << min_new;
+            TRACE << "  Parent " << node;
 #endif
 
             return {newleft, newnode, key < min_new};
           }
 
+          // Split one leaf into two in existing node
           if (p->size() < b_factor) {
 #if defined(_UNIT_TEST_BUILD)
-	    TRACE << "Adding to parent " << p;
+            TRACE << "Adding to parent " << p;
 #endif
             assert(!p->isLeaf());
             // There's enough space to save link
             // Find a place of node link
             int i = 0, j = 0;
-            while (max_old > p->keys[i] && i <= p->size()) i++;  // Now i is place of current node
+            while (min_new > p->keys[i] && i < p->size()) i++;  // Now i is place of current node
 
             // Move last value right
             p->values[p->size() + 1] = p->values[p->size()];
@@ -200,58 +201,58 @@ namespace structure {
             }
             p->status.size++;
 
-            // All keys left in \c node are less than \c min_new
-            p->keys[i] = min_new;
+            // All keys left in \c node are less than \c newnode->keys[0]
+            p->keys[i] = newnode->keys[0];
             p->values[i] = node;
 
             // min_new <= newnode->keys[] < max_old
-	    //            p->keys[j] = max_old;
-            p->values[i+1] = newnode;
+            //            p->keys[j] = max_old;
+            p->values[i + 1] = newnode;
 
 #if defined(_UNIT_TEST_BUILD)
-	    TRACE << "New parent " << p;
+            TRACE << "New parent " << p;
 #endif
           } else {
             // Not enough space, splitting parent
             // For easier implementation let's place both new nodes to
             // single new parent node (right one)
 
-	    // node and newnode contain 2 new leafs
+            // node and newnode contain 2 new leafs
 
 #if defined(_UNIT_TEST_BUILD)
-	    TRACE << "Splitting parent " << p;
+            TRACE << "Splitting parent " << p;
 #endif
 
             auto [newleft, newright, left] = split(p, key);
-	    TRACE << " node " << node;
-	    TRACE << " newnode " << newnode;
-	    TRACE << " min_new " << min_new;
-	    TRACE << " newleft " << newleft;
-	    TRACE << " newright " << newright;
-	    TRACE << " p " << p;
+            TRACE << " node " << node;
+            TRACE << " newnode " << newnode;
+            TRACE << " min_new " << min_new;
+            TRACE << " newleft " << newleft;
+            TRACE << " newright " << newright;
+            TRACE << " p " << p;
 
-	    {
-	      auto& target = left?newleft:newright;
-	      int i = 0, j = 0;
-	      while (min_new > target->keys[i] && i <= target->size()) i++;
-	      // Move rest of keys and values to the right
-	      for (j = target->size() + 1; j > i; j--) {
-		target->keys[j] = target->keys[j - 1];
-		target->values[j] = target->values[j - 1];
-	      }
-	      // Increase size
-	      target->status.size += 1;
-	      target->status.isEmpty = false;
+            {
+              auto& target = left?newleft:newright;
+              int i = 0, j = 0;
+              while (min_new > target->keys[i] && i <= target->size()) i++;
+              // Move rest of keys and values to the right
+              for (j = target->size() + 1; j > i; j--) {
+                target->keys[j] = target->keys[j - 1];
+                target->values[j] = target->values[j - 1];
+              }
+              // Increase size
+              target->status.size += 1;
+              target->status.isEmpty = false;
 
-	      // Set actual value
-	      target->keys[i] = min_new;
-	      target->values[i] = node;
-	      target->values[i+1] = newnode;
-	    }
+              // Set actual value
+              target->keys[i] = min_new;
+              target->values[i] = node;
+              target->values[i + 1] = newnode;
+            }
 
-	    TRACE << " newleft " << newleft;
-	    TRACE << " newright " << newright;
-	    TRACE << " p " << p;
+            TRACE << " newleft " << newleft;
+            TRACE << " newright " << newright;
+            TRACE << " p " << p;
           }
         }
 
@@ -265,11 +266,11 @@ namespace structure {
       template <typename value_type>
       static void do_insert(nodeptr_t node, key_t key, value_type value) {
 #ifndef NDEBUG
-	assert(node);
-	if (node->isLeaf())
-	  assert(typeid(value) == typeid(value_t));
-	if (!node->isLeaf())
-	  assert(typeid(value) == typeid(nodeptr_t));
+        assert(node);
+        if (node->isLeaf())
+          assert(typeid(value) == typeid(value_t));
+        if (!node->isLeaf())
+          assert(typeid(value) == typeid(nodeptr_t));
 #endif
         int i = 0, j = 0;
         while (key > node->keys[i] && i < node->size()) i++;
@@ -286,58 +287,63 @@ namespace structure {
 
         // Increase size
         node->status.size++;
-	node->status.isEmpty = false;
+        node->status.isEmpty = false;
 
         // Set actual value
         node->keys[i] = key;
         node->values[i] = value;
 
 #if defined(_UNIT_TEST_BUILD)
-	TRACE << "Placed '" << key << ":" << value << "' to " << node;
+        TRACE << "Placed '" << key << ":" << value << "' to " << node;
 #endif
       }
 
     public:
 #if defined(_UNIT_TEST_BUILD)
       operator std::string() const {
-	std::string result{ std::string("(") + std::string(isLeaf() ? "l" : "n") + std::to_string(size()) + " " };
-	if (isLeaf()) {
-	  std::ostringstream ss;
-	  ss << "[ ";
-	  for (int i = 0; i < size(); i++)
-	    ss << keys[i] << " ";
-	  ss << "]";
-	  result += ss.str();
-	} else {
-	  for (int i = 0; i < size(); i++) {
-	    std::string contents = *std::get<nodeptr_t>(values[i]);
-	    result += "(<" + std::to_string(keys[i]) + " " + contents + ") ";
-	  }
-	  std::string contents = *std::get<nodeptr_t>(values[size()]);
-	  result += "(>" + std::to_string(keys[size()-1]) + " " + contents + ")";
-	}
-	result += ")";
-	std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	return result;
+        char buf[19];
+        snprintf(buf, 19, "0x%lx", reinterpret_cast<uint64_t>(reinterpret_cast<const void *>(this)));
+        std::string result{
+          std::string("(") + std::string(isLeaf() ? "l" : "n") + std::to_string(size()) + " " + std::string(buf) + " " };
+        if (isLeaf()) {
+          std::ostringstream ss;
+          ss << "[ ";
+          for (int i = 0; i < size(); i++)
+            ss << keys[i] << " ";
+          ss << "]";
+          result += ss.str();
+        } else {
+          if (!empty()) {
+            for (int i = 0; i < size(); i++) {
+              std::string contents = *std::get<nodeptr_t>(values[i]);
+              result += "(<" + std::to_string(keys[i]) + " " + contents + ") ";
+            }
+            std::string contents = *std::get<nodeptr_t>(values[size()]);
+            result +=
+              "(>" + std::to_string(keys[size() - 1]) + " " + contents + ")";
+          }
+        }
+        result += ")";
+        return result;
       }
 
       friend std::ostream& operator<< (std::ostream& out, const nodeptr_t& p) {
-	if (!p)
-	  return out << "@0x0";
-	std::string newline = *p;
-	return out << newline;
+        if (!p)
+          return out << "@0x0";
+        std::string newline = *p;
+        return out << newline;
       }
 
       friend std::ostream& operator<< (std::ostream& out, const BPTNode<key_t, value_t, b_factor>& n) {
-	std::string newline = n;
-	return out << newline;
+        std::string newline = n;
+        return out << newline;
       }
 #endif
       BPTNode(bool leaf, nodeptr_t prt=nullptr) :
         status{leaf, true, 0},
         parent{prt}
       {
-	static_assert(b_factor > 2);
+        static_assert(b_factor > 2);
         TRACE << "New " << (leaf ? "l" : "n") << " prt " << prt;
       };
 
@@ -349,7 +355,7 @@ namespace structure {
       }
 
       std::optional<value_t> find(key_t key) {
-	TRACE << "Searching " << key;
+        TRACE << "Searching " << key;
         if (isLeaf()) {
           // Scan keys to find appropriate value
           auto result = scanValues(this, key);
@@ -368,7 +374,7 @@ namespace structure {
       }
 
       void insert(key_t key, value_t value) {
-	TRACE << "Inserting " << key << ":" << value;
+        TRACE << "Inserting " << key << ":" << value;
         // Find a leaf to insert key to
         auto node = findLeaf(this, key);
         assert(node->isLeaf());
